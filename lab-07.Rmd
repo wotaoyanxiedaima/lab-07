@@ -1,43 +1,185 @@
 ---
-title: "Lab 07 - Under Constuction"
-author: "INSERT YOUR NAME HERE"
+title: "Lab 07 - Modelling course evaluations"
+author: "INSERT NAME HERE"
 date: "`r Sys.Date()`"
 output: html_document
 ---
 
-```{r load-packages, message = FALSE, warning=FALSE, echo = FALSE}
-library(emo)
-#devtools::install_github("hadley/emo")
-```
+### Packages and Data
 
-This template repository for the IDS lab is currently under construction. 👷🔨
-
-Please return back to this page later in the course.
-
-
-## In the meantime...
-
-Have a look at the following data from the `datasauRus` package. Each data set has the same mean, variance and correlation values, but they all look different!
-
-
-
-```{r datasuRus, message = FALSE, fig.height=10}
-library(datasauRus)
+```{r load-packages, message=FALSE, echo=TRUE}
 library(tidyverse)
-library(ggplot2)
+library(tidymodels)
 
-ggplot(datasaurus_dozen, aes(x = x, y = y, colour = dataset))+
-    geom_point()+
-    theme(legend.position = "none")+
-    facet_wrap(~dataset, ncol = 3)
-
-datasaurus_dozen %>% 
-    group_by(dataset) %>% 
-    summarize(
-      mean_x    = mean(x),
-      mean_y    = mean(y),
-      std_dev_x = sd(x),
-      std_dev_y = sd(y),
-      corr_x_y  = cor(x, y)
-    )
 ```
+
+
+```{r read-data}
+evals<-read.csv("data/evals.csv", row.names=1)
+```
+
+
+# Exercise 1: Exploratory Data Analysis
+
+1.  Visualize the distribution of `score` in the dataframe `evals`.
+
+```{r viz-score}
+# add code here
+```
+
+*Add your other details and narratives here.*
+
+2.  Visualize and describe the relationship between `score` and `bty_avg` using `geom_point()` to represent the data. 
+
+```{r scatterplot}
+# add code here
+```
+
+*Add your narrative and other details here.*
+
+# Exercise 2: Simple Linear regression with a numerical predictor
+
+1. Fit a linear model called `score_bty_fit` to predict average professor evaluation `score` from average beauty rating (`bty_avg`). Print the regression output using `tidy()`.
+
+```{r fit-score_bty_fit, eval = FALSE}
+# remove eval = FALSE from the code chunk options after filling in the blanks
+score_bty_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(___ ~ ___, data = ___)
+```
+
+```{r tidy-score_bty_fit, eval = FALSE}
+# remove eval = FALSE from the code chunk options after filling in the blanks
+tidy(___)
+```
+
+*Add your linear model here. Don't worry too much about notation, you can use things like score-hat.*
+
+2. Plot the data again using `geom_jitter()`, and add the regression line.
+
+```{r viz-score_bty_fit,eval=FALSE}
+# add your plot here. Hint, you can add the regression line using geom_smooth()
+```
+
+3. Interpret the slope of the linear model in context of the data.
+
+*Add your interpretation here*
+
+4. Interpret the intercept of the linear model in context of the data. Comment on whether or not the intercept makes sense in this context.
+
+*Add your interpretation here*
+
+5. Determine the $R^2$ of the model and interpret it in the context of the data.
+
+```{r R2, eval = FALSE}
+# remove eval = FALSE from the code chunk options after filling in the blanks
+glance(___)$___
+```
+
+*Add your interpretation here*
+
+6. Make a plot of residuals vs. predicted values for the model above.
+
+```{r viz-score_bty_fit-diagnostic, eval = FALSE}
+# remove eval = FALSE from the code chunk options after filling in the blanks
+score_bty_aug <- augment(score_bty_fit$fit)
+
+ggplot(___) + ...
+```
+
+# Exercise 3: Simple Linear regression with a categorical predictor
+
+0. Look at the variable rank, and determine the frequency of each category level.
+
+```{r}
+# ... 
+```
+
+1. Fit a new linear model called `score_rank_fit` to predict average professor evaluation `score` based on `rank` of the professor.
+
+```{r fit-score_rank_fit}
+# fit model
+
+# tidy model output
+```
+
+*Add your narrative here.*
+
+2. Fit a new linear model called `score_gender_fit` to predict average professor evaluation `score` based on `gender` of the professor. 
+
+```{r fit-score_gender_fit}
+# fit model
+
+# tidy model output
+```
+
+```{r score_gender_intercept, eval=FALSE}
+# remove eval = FALSE from the code chunk options
+score_gender_intercept <- tidy(score_gender_fit) %>% 
+  filter(term == "(Intercept)") %>%
+  select(estimate) %>%
+  pull()
+```
+
+```{r score_gender_slope, eval=FALSE}
+# remove eval = FALSE from the code chunk options
+score_gender_slope <- tidy(score_gender_fit) %>% 
+  filter(term == "gendermale") %>%
+  select(estimate) %>%
+  pull()
+```
+
+*Add your narrative here. Use in-line code!*
+
+# Exercise 4: Multiple linear regression
+
+1. Fit a multiple linear regression model, predicting average professor evaluation `score` based on average beauty rating (`bty_avg`) and `gender.`
+
+```{r fit-score_bty_gender_fit}
+# fit model
+
+# tidy model output
+```
+
+*Add your narrative here.*
+
+```{r eval = FALSE}
+ggplot(___) + ...
+```
+
+2. What percent of the variability in `score` is explained by the model `score_bty_gender_fit`. 
+
+```{r}
+# ...
+```
+
+
+3. What is the equation of the line corresponding to just male professors?
+
+*Add your equation here.*
+
+4. For two professors who received the same beauty rating, which gender tends to have the higher course evaluation score?
+
+*Add your narrative here.*
+
+5. How does the relationship between beauty and evaluation score vary between male and female professors?
+
+*Add your narrative here.*
+
+6. How do the adjusted $R^2$ values of `score_bty_fit` and `score_bty_gender_fit` compare? 
+
+```{r eval=FALSE}
+# remove eval = FALSE from the code chunk options after filling in the blanks
+glance(___)$adj.r.squared
+glance(___)$adj.r.squared
+```
+
+*Add your narrative here.*
+
+7. Compare the slopes of `bty_avg` under the two models (`score_bty_fit` and `score_bty_gender_fit`).
+
+*Add your narrative here.*
+
+# Exercise 5: Interpretation of log-transformed response variables
+
+If you do not know how to use LaTeX, do this exercise with pen and paper.
